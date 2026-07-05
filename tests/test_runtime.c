@@ -92,10 +92,34 @@ static void test_cycle_rejects(void) {
     assert(dso_compile(&ctx, contract, &verdict) == DSO_ERR_CYCLE);
 }
 
+static void test_frames(void) {
+    unsigned char memory[512];
+    dso_arena arena;
+    dso_context ctx;
+    dso_verdict verdict;
+    uint32_t a;
+    state s = {0};
+
+    dso_arena_init(&arena, memory, sizeof(memory));
+    dso_context_init(&ctx, &arena);
+    assert(dso_task(&ctx, "inc", inc, &s, &a) == DSO_OK);
+    dso_contract contract = {
+        .max_tasks = 4,
+        .max_deps = 4,
+        .max_frame_ns = 1000000000
+    };
+    assert(dso_compile(&ctx, contract, &verdict) == DSO_OK);
+    assert(dso_run_frames(&ctx, 5) == DSO_OK);
+    assert(s.value == 5);
+    assert(dso_metrics_get(&ctx)->frame_count == 5);
+    assert(dso_metrics_get(&ctx)->worst_frame_ns > 0);
+}
+
 int main(void) {
     test_pipeline();
     test_contract_rejects();
     test_cycle_rejects();
+    test_frames();
     puts("dso runtime tests passed");
     return 0;
 }

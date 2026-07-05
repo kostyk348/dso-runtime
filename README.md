@@ -25,10 +25,24 @@ Run the example:
 ./build/dso_pipeline
 ```
 
+Run a repeated frame/tick plan:
+
+```bash
+./build/dso_frame_loop 10000
+```
+
 Run a normal Linux program under simple process-level constraints:
 
 ```bash
 ./build/dso-run --cpu 0 --mem-mb 256 -- /bin/echo hello
+```
+
+Steam usage is documented in [STEAM.md](STEAM.md).
+
+Short timeout smoke test:
+
+```bash
+./build/dso-run --cpu 0 --mem-mb 256 --timeout-sec 2 -- ./build/dso_frame_loop 50000
 ```
 
 ## Minimal Model
@@ -57,7 +71,6 @@ DSO starts by making execution structure explicit. Parallel execution can be add
 ## Next Steps
 
 - add cgroup v2 wrapper
-- add repeated execution frames
 - add bounded queues
 - add worker pool with static schedule partitions
 - export Chrome trace format

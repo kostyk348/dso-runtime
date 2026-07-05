@@ -16,6 +16,9 @@ target_compile_options(dso PRIVATE -Wall -Wextra -Wpedantic)
 add_executable(dso_pipeline examples/pipeline.c)
 target_link_libraries(dso_pipeline PRIVATE dso)
 
+add_executable(dso_frame_loop examples/frame_loop.c)
+target_link_libraries(dso_frame_loop PRIVATE dso)
+
 add_executable(dso_tests tests/test_runtime.c)
 target_link_libraries(dso_tests PRIVATE dso)
 

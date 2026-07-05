@@ -106,6 +106,10 @@ dso_status dso_compile(dso_context *ctx, dso_contract contract, dso_verdict *ver
     ctx->metrics.arena_bytes = ctx->arena ? ctx->arena->high_water : 0;
     ctx->metrics.plan_steps = ctx->task_count;
     ctx->metrics.worst_step_ns = 0;
+    ctx->metrics.frame_count = 0;
+    ctx->metrics.worst_frame_ns = 0;
+    ctx->metrics.total_frame_ns = 0;
+    ctx->metrics.frame_overruns = 0;
 
     if (ctx->task_count == 0) {
         verdict_set(verdict, DSO_ERR_INVALID, "graph has no tasks", ctx->metrics);
@@ -188,6 +192,42 @@ dso_status dso_execute(dso_context *ctx) {
     return DSO_OK;
 }
 
+dso_status dso_execute_frame(dso_context *ctx) {
+    if (!ctx || ctx->schedule_count != ctx->task_count) {
+        return DSO_ERR_INVALID;
+    }
+
+    uint64_t frame_start = monotonic_ns();
+    dso_status st = dso_execute(ctx);
+    uint64_t frame_end = monotonic_ns();
+    uint64_t frame_ns = frame_end - frame_start;
+
+    ctx->metrics.frame_count++;
+    ctx->metrics.total_frame_ns += frame_ns;
+    if (frame_ns > ctx->metrics.worst_frame_ns) {
+        ctx->metrics.worst_frame_ns = frame_ns;
+    }
+    if (ctx->contract.max_frame_ns && frame_ns > ctx->contract.max_frame_ns) {
+        ctx->metrics.frame_overruns++;
+        return DSO_ERR_RUNTIME;
+    }
+    return st;
+}
+
+dso_status dso_run_frames(dso_context *ctx, uint64_t frames) {
+    if (!ctx || frames == 0) {
+        return DSO_ERR_INVALID;
+    }
+    dso_status last = DSO_OK;
+    for (uint64_t i = 0; i < frames; i++) {
+        last = dso_execute_frame(ctx);
+        if (last != DSO_OK) {
+            return last;
+        }
+    }
+    return last;
+}
+
 dso_status dso_write_trace_json(const dso_context *ctx, FILE *out) {
     if (!ctx || !out) {
         return DSO_ERR_INVALID;
@@ -205,11 +245,15 @@ dso_status dso_write_trace_json(const dso_context *ctx, FILE *out) {
     }
     fprintf(out, "  ],\n");
     fprintf(out,
-            "  \"metrics\": {\"tasks\": %" PRIu64 ", \"deps\": %" PRIu64 ", \"arena_bytes\": %" PRIu64 ", \"worst_step_ns\": %" PRIu64 "}\n",
+            "  \"metrics\": {\"tasks\": %" PRIu64 ", \"deps\": %" PRIu64 ", \"arena_bytes\": %" PRIu64 ", \"worst_step_ns\": %" PRIu64 ", \"frames\": %" PRIu64 ", \"worst_frame_ns\": %" PRIu64 ", \"avg_frame_ns\": %" PRIu64 ", \"frame_overruns\": %" PRIu64 "}\n",
             ctx->metrics.task_count,
             ctx->metrics.dep_count,
             ctx->metrics.arena_bytes,
-            ctx->metrics.worst_step_ns);
+            ctx->metrics.worst_step_ns,
+            ctx->metrics.frame_count,
+            ctx->metrics.worst_frame_ns,
+            ctx->metrics.frame_count ? ctx->metrics.total_frame_ns / ctx->metrics.frame_count : 0,
+            ctx->metrics.frame_overruns);
     fprintf(out, "}\n");
     return DSO_OK;
 }

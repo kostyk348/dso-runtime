@@ -37,6 +37,7 @@ typedef struct {
     size_t max_arena_bytes;
     uint64_t max_plan_steps;
     uint64_t max_step_ns;
+    uint64_t max_frame_ns;
 } dso_contract;
 
 typedef struct {
@@ -45,6 +46,10 @@ typedef struct {
     uint64_t arena_bytes;
     uint64_t plan_steps;
     uint64_t worst_step_ns;
+    uint64_t frame_count;
+    uint64_t worst_frame_ns;
+    uint64_t total_frame_ns;
+    uint64_t frame_overruns;
 } dso_metrics;
 
 typedef struct {
@@ -72,6 +77,8 @@ dso_status dso_task(dso_context *ctx, const char *name, dso_task_fn fn, void *us
 dso_status dso_dep(dso_context *ctx, uint32_t before, uint32_t after);
 dso_status dso_compile(dso_context *ctx, dso_contract contract, dso_verdict *verdict);
 dso_status dso_execute(dso_context *ctx);
+dso_status dso_execute_frame(dso_context *ctx);
+dso_status dso_run_frames(dso_context *ctx, uint64_t frames);
 dso_status dso_write_trace_json(const dso_context *ctx, FILE *out);
 
 const char *dso_status_str(dso_status status);
