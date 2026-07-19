@@ -1,6 +1,12 @@
 build/
-__pycache__/
 *.o
 *.a
 *.so
-*.log
+*.out
+tmp/
+tags
+.vscode/
+.idea/
+*.swp
+*.swo
+*.dSYM/

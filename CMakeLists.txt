@@ -19,6 +19,22 @@ target_link_libraries(dso_pipeline PRIVATE dso)
 add_executable(dso_frame_loop examples/frame_loop.c)
 target_link_libraries(dso_frame_loop PRIVATE dso)
 
+add_executable(dso_dsp examples/dsp_pipeline.c)
+target_link_libraries(dso_dsp PRIVATE dso m)
+target_compile_options(dso_dsp PRIVATE -Wall -Wextra -Wpedantic)
+
+add_executable(dso_parallel examples/parallel_demo.c)
+target_link_libraries(dso_parallel PRIVATE dso m)
+target_compile_options(dso_parallel PRIVATE -Wall -Wextra -Wpedantic)
+
+add_executable(dso_benchmark examples/benchmark.c)
+target_link_libraries(dso_benchmark PRIVATE dso m)
+target_compile_options(dso_benchmark PRIVATE -Wall -Wextra -Wpedantic)
+
+add_executable(dso_ecs examples/ecs_demo.c)
+target_link_libraries(dso_ecs PRIVATE dso m)
+target_compile_options(dso_ecs PRIVATE -Wall -Wextra -Wpedantic)
+
 add_executable(dso_tests tests/test_runtime.c)
 target_link_libraries(dso_tests PRIVATE dso)
 
