@@ -1,5 +1,9 @@
 # DSO Runtime
 
+[![Release](https://img.shields.io/github/v/release/kostyk348/dso-runtime?sort=semver&color=blue)](https://github.com/kostyk348/dso-runtime/releases)
+[![License](https://img.shields.io/badge/license-Apache-2.0-green)](https://github.com/kostyk348/dso-runtime/blob/main/LICENSE)
+[![Last commit](https://img.shields.io/github/last-commit/kostyk348/dso-runtime?branch=main)](https://github.com/kostyk348/dso-runtime/commits/main)
+
 Deterministic task graph execution framework for real-time systems.
 
 ```
@@ -52,39 +56,46 @@ dso_execute_parallel(&ctx, &pool);  // level-based parallelism
 ## Features
 
 ### Core
+
 - **Arena allocator** — bump-alloc, O(1), zero fragmentation
 - **Handle-based memory** — `dso_handle → dso_mem_region → pointer`, supports double-buffering via redirect
 - **Typed pools** — fixed-size object pool, O(1) alloc/free, handle-based access
 - **Bounded SPSC queues** — lock-free ring buffer, power-of-2 capacity
 
 ### Scheduling
+
 - **Topological sort** — cycle detection, Kahn's algorithm
 - **Dependency levels** — groups independent tasks → parallel execution
 - **Worker pool** — pthread-based, spin barriers, up to 16 workers
 - **Level-aware execution** — `dso_execute_parallel()` / `dso_execute_frame_parallel()`
 
 ### Contracts
+
 - **Compile-time** — max tasks, deps, arena bytes, plan steps
 - **Runtime** — per-task WCET (`max_step_ns`), per-frame WCET (`max_frame_ns`)
 - **Multi-layer** — Resource / Control / Runtime → `dso_deployment_contract`
 
 ### Tooling
+
 - **Chrome trace export** — `dso_trace_export_chrome()` → `chrome://tracing`
 - **Plan serialization** — `dso_plan_save()` / `dso_plan_load()` — binary snapshot
 - **JSON trace** — `dso_write_trace_json()` — per-task durations
 - **Metrics** — worst step, worst frame, overrun counter, arena high-water
 
 ### Sandbox
+
 - `dso-run` — Linux process launcher with CPU pin, mem limit, mlock, timeout, **cgroup v2**
 
 ## Benchmarks
 
 ### Arena allocator
+
 ```
 arena_alloc 64 bytes     195,139,085 ops/sec   0.005 us/op
 ```
 
 ### SPSC Queue (64 slots)
+
 ```
 push/pop pairs            80,261,460 ops/sec   0.012 us/op
 ```
@@ -103,6 +114,7 @@ Speedup:   1.93x
 ```
 
 ### Flecs integration
+
 ```
 3 Flecs systems, 50k entities, DSO orchestration
   369 us/frame (1 worker)
@@ -120,18 +132,23 @@ ctest --test-dir build
 
 ```bash
 # DSP pipeline with memory redirection + queues
+
 ./build/dso_dsp 10
 
 # 100k particle ECS simulation
+
 ./build/dso_ecs 100000 100 4
 
 # Parallel speedup comparison
+
 ./build/dso_parallel 5 4
 
 # Full benchmark suite
+
 ./build/dso_benchmark
 
 # Flecs integration demo (requires Flecs)
+
 ./build/flecs_dso 100000 100
 ```
 
