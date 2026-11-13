@@ -1,10 +1,19 @@
+<div align="center">
+
+<img src="docs/banner.svg" alt="dso-runtime banner" width="1000">
+
 # DSO Runtime
+
+### Deterministic task graph execution framework for real-time systems.
 
 [![Release](https://img.shields.io/github/v/release/kostyk348/dso-runtime?sort=semver&color=blue)](https://github.com/kostyk348/dso-runtime/releases)
 [![License](https://img.shields.io/badge/license-Apache-2.0-green)](https://github.com/kostyk348/dso-runtime/blob/main/LICENSE)
 [![Last commit](https://img.shields.io/github/last-commit/kostyk348/dso-runtime?branch=main)](https://github.com/kostyk348/dso-runtime/commits/main)
 
-Deterministic task graph execution framework for real-time systems.
+</div>
+
+---
+
 
 ```
 libdso.a  —  C11  —  no deps beyond POSIX + pthreads  —  MIT
